@@ -1,0 +1,21 @@
+State 89 conflicts: 7 shift/reduce
+State 90 conflicts: 7 shift/reduce
+State 129 conflicts: 7 shift/reduce
+State 130 conflicts: 7 shift/reduce
+State 131 conflicts: 7 shift/reduce
+State 132 conflicts: 7 shift/reduce
+State 133 conflicts: 7 shift/reduce
+State 134 conflicts: 7 shift/reduce
+State 135 conflicts: 7 shift/reduce
+
+State 89:
+    οι 7 συγκρουσεις αφορούν τους σχεσιακους
+    και λογικους τελεστές (and, or, rel) και
+    τους αριθμητικούς (add, mul, div, power)
+    σε όλους αυτούς τους τελεστές ισχύει 
+    αριστερή προσεταιριστικότητα
+
+State 90, 129, 130, 131, 132, 133, 134, 135
+    όπως ακριβώς και με την κατάσταση 89 
+    ισχύει η αριστερή προσεταιριστικότητα
+
