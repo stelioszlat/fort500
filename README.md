@@ -1,9 +1,9 @@
 AM: 2116\*\*0
-FORT500
+FORT400
 
 A.Lectical Rules
 KEYWORDS:
-FUNCTION SUBROUTINE END INTEGER REAL LOGICAL CHARACTER RECORD ENDREC DATA CONTINUE GOTO CALL READ WRITE IF THEN ELSE ENDIF DO ENDO STOP RETURN
+FUNCTION SUBROUTINE END INTEGER REAL LOGICAL CHARACTER DATA CONTINUE GOTO CALL READ WRITE IF THEN ELSE ENDIF DO ENDDO STOP RETURN
 
 ID:
 anything
@@ -14,14 +14,14 @@ anything_
 ICONST:
 0
 1234567890
-OH1234567890ABCDEF
-OB10
+Ox1234567890ABCDEF
+Ob10
 
 RCONST:
 0.0
 1234567890.1234567890E+-1234567890
-0H1234567890ABCDEF.1234567890ABCDEF
-0B10.10
+0x1234567890ABCDEF.1234567890ABCDEF
+0b10.10
 
 LCONST:
 .TRUE.
@@ -38,6 +38,8 @@ ANDOP: .AND.
 NOTOP: .NOT.
 
 RELOP: .GT. .GE. .LT. .LE. .EQ. .NE.
+
+PAIROP: .HEAD. .TAIL.
 
 STRING:
 "CCONST\*"
@@ -56,9 +58,11 @@ program -> body END subprograms
 
 body -> declarations statements
 
-declarations -> declarations type vars
-| declarations RECORD fields ENDREC vars
+declarations -> declarations couplespec type vars
 | declarations DATA vals
+| ε
+  
+couplespec -> COUPLE
 | ε
 
 type -> INTEGER | REAL | LOGICAL | CHARACTER
@@ -86,17 +90,24 @@ vals -> vals COMMA ID value_list
 values -> values COMMA value
 | value
 
-value -> repeat MULOP ADDOP constant
+value -> repeat MULOP ADDOP simp_constant
 | repeat MULOP constant
 | repeat MULOP STRING
-| ADDOP constant
+| ADDOP simp_constant
 | constant
 | STRING
 
 repeat -> ICONST | ε
 
-constant -> ICONST | RCONST | LCONST | CCONST
+simp_constant -> ICONST | RCONST | LCONST | CCONST
 
+constant -> simp_constant | coup_constant
+  
+coup_ constant -> LPAREN simp_constant COLON simp_constant RPAREN
+| LPAREN simp_constant COLON ADDOP simp_constant RPAREN
+| LPAREN simp_constant COLON simp_consant RAPREN
+| LPAREN simp_constant COLON ADDOP simp_constant RPAREN
+  
 statements -> statements labeled_statement
 | labeled_statement
 
@@ -120,8 +131,8 @@ simple_statement -> assignment
 assignment -> variable ASSIGN expression
 | variable ASSIGN STRING
 
-variable -> variable COLON ID
-| variable LPAREN expressions RPAREN
+variable -> variable LPAREN expressions RPAREN
+| ID
 
 expressions -> expressions COMMA expression
 | expression
@@ -137,6 +148,7 @@ expression -> expression OROP expression
 | ADDOP expression
 | variable
 | constant
+| LPAREN expression COLON expression RPAREN
 | LPAREN expression RPAREN
 
 goto_statement -> GOTO label
