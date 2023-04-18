@@ -1,0 +1,8 @@
+stage1/lex.yy.c
+stage1/lex
+
+stage2/lex.yy.c
+stage2/hash_table.o
+stage2/syntactical.output
+stage2/syntactical.tab.*
+stage2/lex.yy.c
