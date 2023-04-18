@@ -1,9 +1,9 @@
 AM: 2116\*\*0
-FORT400
+FORT200
 
 A.Lectical Rules
 KEYWORDS:
-FUNCTION SUBROUTINE END INTEGER REAL LOGICAL CHARACTER DATA CONTINUE GOTO CALL READ WRITE IF THEN ELSE ENDIF DO ENDDO STOP RETURN
+FUNCTION SUBROUTINE END INTEGER REAL LOGICAL CHARACTER COMPLEX RECORD ENDREC LIST DATA CONTINUE GOTO CALL READ WRITE NEW LENGTH IF THEN ELSE ENDIF DO ENDDO STOP RETURN
 
 ID:
 anything
@@ -39,7 +39,16 @@ NOTOP: .NOT.
 
 RELOP: .GT. .GE. .LT. .LE. .EQ. .NE.
 
-PAIROP: .HEAD. .TAIL.
+ADDOP: + - 
+
+MULOP: *
+
+DIVOP: /
+
+POWEROP: **
+
+LISTFUNC:
+AD* | D+ | CD+R
 
 STRING:
 "CCONST\*"
@@ -48,7 +57,10 @@ LPAREN: (
 RPAREN: )
 COMMA: ,
 ASSIGN: =
+DOT: .
 COLON: :
+LBRACK: [
+RBRACK: ]
 EOF: <EOF>
 
 COMMENTS: \$ comment until end of line
@@ -58,19 +70,18 @@ program -> body END subprograms
 
 body -> declarations statements
 
-declarations -> declarations couplespec type vars
+declarations -> declarations type vars
+| declarations RECORD fields ENDREC vars
 | declarations DATA vals
 | ε
-  
-couplespec -> COUPLE
-| ε
 
-type -> INTEGER | REAL | LOGICAL | CHARACTER
+type -> INTEGER | REAL | LOGICAL | CHARACTER | COMPLEX
 
 vars -> vars COMMA undef_variable
 | undef_variable
 
-undef_variable -> ID LPAREN dims RPAREN
+undef_variable -> LIST undef_variable
+| ID LPAREN dims RPAREN
 | ID
 
 dims -> dims COMMA dim
@@ -87,26 +98,23 @@ field -> type vars
 vals -> vals COMMA ID value_list
 | ID value_list
 
+value_list -> DIVOP values DIVOP
+
 values -> values COMMA value
 | value
 
-value -> repeat MULOP ADDOP simp_constant
-| repeat MULOP constant
-| repeat MULOP STRING
-| ADDOP simp_constant
-| constant
+value -> sign constant
 | STRING
 
-repeat -> ICONST | ε
+sign -> ADDOP
+| ε
 
-simp_constant -> ICONST | RCONST | LCONST | CCONST
+constant -> simple_constant
+| complex_constant
 
-constant -> simp_constant | coup_constant
-  
-coup_ constant -> LPAREN simp_constant COLON simp_constant RPAREN
-| LPAREN simp_constant COLON ADDOP simp_constant RPAREN
-| LPAREN simp_constant COLON simp_consant RAPREN
-| LPAREN simp_constant COLON ADDOP simp_constant RPAREN
+simple_constant -> ICONST | RCONST | LCONST | CCONST
+
+complex_constant -> LPAREN RCONST COLON sign RCONST RPAREN
   
 statements -> statements labeled_statement
 | labeled_statement
@@ -131,7 +139,9 @@ simple_statement -> assignment
 assignment -> variable ASSIGN expression
 | variable ASSIGN STRING
 
-variable -> variable LPAREN expressions RPAREN
+variable -> variable DOT ID
+| variable LPAREN expressions RPAREN
+| LISTFUNC LPAREN expression RPAREN
 | ID
 
 expressions -> expressions COMMA expression
@@ -147,9 +157,16 @@ expression -> expression OROP expression
 | NOTOP expression
 | ADDOP expression
 | variable
-| constant
-| LPAREN expression COLON expression RPAREN
+| simple_constant
+| LENGTH LPAREN expression RPAREN
+| NEW LPAREN expression RPAREN
 | LPAREN expression RPAREN
+| LPAREN expression COLON expression RPAREN
+| listexpression
+
+
+listexpression -> LBRACK expressions RBRACK
+| LBRACK RBRACK 
 
 goto_statement -> GOTO label
 | GOTO ID COMMA LPAREN labels RPAREN
@@ -199,6 +216,7 @@ subprograms -> subprograms subprogram
 subprogram -> header body END
 
 header -> type FUNCTION ID LPAREN formal_parameters RPAREN
+| LIST FUNCTION ID LPAREN formal_parameters RPAREN
 | SUBROUTINE ID LPAREN formal_parameters RPAREN
 | SUBROUTINE ID
 
